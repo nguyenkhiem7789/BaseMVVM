@@ -1,4 +1,4 @@
-package com.nguyen.basemvvm.ui.base
+package com.nguyen.basemvvm.ui.base.view
 
 import android.app.Dialog
 import android.content.Context
@@ -11,16 +11,17 @@ import com.nguyen.basemvvm.R
 object Loading {
     private var loadingDialog: LoadingDialog? = null
 
-    fun showLoading(context: Context) {
+    fun show(context: Context) {
         if(loadingDialog == null) {
-            loadingDialog = LoadingDialog(context)
+            loadingDialog =
+                LoadingDialog(context)
         }
         if(!loadingDialog!!.isShowing) {
             loadingDialog!!.show()
         }
     }
 
-    fun dismissLoading() {
+    fun dismiss() {
         if(loadingDialog != null && loadingDialog!!.isShowing) {
             loadingDialog!!.dismiss()
             loadingDialog = null

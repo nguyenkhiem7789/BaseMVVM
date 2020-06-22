@@ -1,4 +1,4 @@
-package com.nguyen.basemvvm.ui.di.scope
+package com.nguyen.basemvvm.ui.base.di.scope
 
 import javax.inject.Scope
 

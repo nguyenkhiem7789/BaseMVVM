@@ -4,6 +4,7 @@
     android:layout_height="wrap_content">
 
     <ProgressBar
+        android:id="@+id/loadMoreView"
         android:layout_width="@dimen/progress_bar_radius"
         android:layout_height="@dimen/progress_bar_radius"
         />

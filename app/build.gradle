@@ -43,6 +43,8 @@ ext {
 
     rxjava_version = "2.2.10"
     rxandroid_version = "2.1.0"
+
+    snackbar_version = "1.1.1"
 }
 
 dependencies {
@@ -72,4 +74,7 @@ dependencies {
     //rxjava
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+
+    //top snackbar
+    implementation "com.androidadvance:topsnackbar:$snackbar_version"
 }

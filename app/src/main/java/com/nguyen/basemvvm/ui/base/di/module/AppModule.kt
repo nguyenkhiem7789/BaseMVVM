@@ -1,4 +1,4 @@
-package com.nguyen.basemvvm.ui.di.module
+package com.nguyen.basemvvm.ui.base.di.module
 
 import android.app.Application
 import com.nguyen.basemvvm.utils.SharePrefsUtils

@@ -1,4 +1,4 @@
-package com.nguyen.basemvvm.ui.base
+package com.nguyen.basemvvm.ui.base.view
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView

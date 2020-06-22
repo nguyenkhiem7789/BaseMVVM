@@ -1,7 +1,8 @@
-package com.nguyen.basemvvm.ui.base
+package com.nguyen.basemvvm.ui.base.view
 
 import androidx.appcompat.app.AppCompatActivity
 import com.nguyen.basemvvm.R
+import com.nguyen.basemvvm.utils.DisposableManager
 
 /**
  * Created by apple on 9/9/17.
@@ -24,5 +25,10 @@ open class BaseActivity: AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onDestroy() {
+        DisposableManager.clear()
+        super.onDestroy()
     }
 }

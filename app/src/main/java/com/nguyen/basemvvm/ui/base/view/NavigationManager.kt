@@ -1,4 +1,4 @@
-package com.nguyen.basemvvm.ui.base
+package com.nguyen.basemvvm.ui.base.view
 
 import android.content.Context
 import android.content.Intent
