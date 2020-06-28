@@ -11,8 +11,11 @@ import com.nguyen.basemvvm.data.remote.request.LoginRequest
 import com.nguyen.basemvvm.ui.authentication.di.LoginModule
 import com.nguyen.basemvvm.ui.authentication.viewmodel.LoginViewModel
 import com.nguyen.basemvvm.ui.base.view.BaseFragment
+import com.nguyen.basemvvm.ui.base.view.NavigationManager
+import com.nguyen.basemvvm.ui.listProduct.view.ListProductFragment
 import com.nguyen.basemvvm.utils.DisposableManager
 import com.nguyen.basemvvm.utils.SnackBar
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_login.view.*
@@ -33,17 +36,19 @@ class LoginFragment : BaseFragment() {
 
     private fun initView(view: View) {
         view.loginButton.setOnClickListener {
-            val userName = view.nameEditText.text.toString()
-            val password = view.passEditText.text.toString()
-            val loginRequest = LoginRequest(userName, password)
-            viewModel.login(loginRequest)
+            navigation.openFragment(R.id.containerFrame, ListProductFragment(), NavigationManager.Type.ADD, null)
+//            val userName = view.nameEditText.text.toString()
+//            val password = view.passEditText.text.toString()
+//            val loginRequest = LoginRequest(userName, password)
+//            viewModel.login(loginRequest)
         }
     }
 
     private fun setupBinding() {
         DisposableManager.add(viewModel
             .isLoading
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 if(it) {
                     //start loading
@@ -53,13 +58,15 @@ class LoginFragment : BaseFragment() {
             })
         DisposableManager.add(viewModel
             .errorMsg
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 SnackBar.show(view!!, it, false)
             })
         DisposableManager.add(viewModel
             .loginResponse
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
 
             })
@@ -69,7 +76,7 @@ class LoginFragment : BaseFragment() {
         context?.let {
             BaseApplication.get(it)
                 .appComponent
-                .plus(LoginModule(activity))
+                .plus(LoginModule())
                 .inject(this)
         }
     }

@@ -1,6 +1,5 @@
 package com.nguyen.basemvvm.ui.base.adapter
 
-import android.content.Context
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,49 +8,48 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nguyen.basemvvm.R
+import com.nguyen.basemvvm.data.remote.response.Product
 import com.nguyen.basemvvm.ui.base.view.EndlessRecyclerOnScrollListener
 import kotlinx.android.synthetic.main.layout_loading.view.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by apple on 9/17/17.
  */
-abstract class LoadMoreAdapter<T>(var ctx: Context, var arrayData: ArrayList<T?>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val TYPE_LOAD_MORE = 100
+    companion object {
+        const val TYPE_LOAD_MORE = 100
+    }
 
-    abstract fun getItemVType(position: Int): Int
+    abstract fun getViewTypeItem(position: Int): Int
 
-    abstract fun onCreateVHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
+    abstract fun onCreateViewHolderItem(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
 
-    abstract fun onBindVHolder(holder: RecyclerView.ViewHolder, position: Int)
+    abstract fun onBindViewHolderItem(holder: RecyclerView.ViewHolder, position: Int)
 
     lateinit var scrollListener: EndlessRecyclerOnScrollListener
 
-    protected var parentView: RecyclerView? = null
+    var parentView: RecyclerView? = null
 
-    fun setRecyclerView(view: RecyclerView) {
-        this.parentView = view
-        val syncal = Collections.synchronizedList(ArrayList<String>())
-
-    }
+    var isClockLoadMore = false
 
     fun setLoadMoreData(loadMoreListener: (currentPage: Int) -> Unit) {
         loadMoreListener(1)
-        Handler().postDelayed(object : Runnable {
-            override fun run() {
-                if(parentView == null)
-                    return
-                //wait 300 ms is time for databinding recyclerview to adapter
-                scrollListener = object: EndlessRecyclerOnScrollListener(parentView?.layoutManager as LinearLayoutManager){
-                    override fun onLoadMore(currentPage: Int) {
-                        loadMore()
-                        loadMoreListener(currentPage)
-                    }
+        if(parentView == null) {
+            return
+        }
+        scrollListener = object: EndlessRecyclerOnScrollListener(parentView?.layoutManager as LinearLayoutManager){
+            override fun onLoadMore(currentPage: Int) {
+                if(!isClockLoadMore) {
+                    isClockLoadMore = true
+                    loadMore()
+                    loadMoreListener(currentPage)
                 }
-                parentView?.addOnScrollListener(scrollListener)
             }
-        }, 300)
+        }
+        parentView?.addOnScrollListener(scrollListener)
     }
 
     private fun loadMore() {
@@ -63,19 +61,19 @@ abstract class LoadMoreAdapter<T>(var ctx: Context, var arrayData: ArrayList<T?>
         if(arrayData[position] == null) {
             return TYPE_LOAD_MORE
         } else {
-            return getItemVType(position)
+            return getViewTypeItem(position)
         }
     }
 
     override fun getItemCount(): Int {
-        return arrayData!!.size
+        return arrayData.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if(holder is LoadMoreViewHoler) {
             holder.itemView.loadMoreView.isIndeterminate = true
         } else {
-            onBindVHolder(holder, position)
+            onBindViewHolderItem(holder, position)
         }
     }
 
@@ -83,11 +81,11 @@ abstract class LoadMoreAdapter<T>(var ctx: Context, var arrayData: ArrayList<T?>
         var viewHolder: RecyclerView.ViewHolder? = null
         viewHolder = when (viewType) {
             TYPE_LOAD_MORE -> {
-                var view = LayoutInflater.from(ctx).inflate(R.layout.layout_loading, parent, false)
+                var view = LayoutInflater.from(parent.context).inflate(R.layout.layout_loading, parent, false)
                 LoadMoreViewHoler(view)
             }
             else -> {
-                onCreateVHolder(parent, viewType)
+                onCreateViewHolderItem(parent, viewType)
             }
         }
         return viewHolder
@@ -107,21 +105,20 @@ abstract class LoadMoreAdapter<T>(var ctx: Context, var arrayData: ArrayList<T?>
 
     fun incrementPage() {
         scrollListener.currentPage++
-        Log.e("XcurrentPage", "" + scrollListener.currentPage)
     }
 
     fun resetPage() {
         scrollListener.currentPage = 1
     }
 
-    fun reloadAdapter(arrayMoreData: ArrayList<T>) {
+    fun addData(arrayMoreData: ArrayList<T?>) {
         for(i in 0 until arrayMoreData.size) {
             arrayData.add(arrayMoreData[i])
             notifyItemInserted(arrayData.size - 1)
         }
     }
 
-    fun clearAdapter() {
+    fun clear() {
         arrayData.clear()
         notifyDataSetChanged()
     }

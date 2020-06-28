@@ -9,4 +9,6 @@
     <string name="warning_pass_format">Mật khẩu phải chứa từ 8 kỳ tự trở lên</string>
     <string name="warning_email_empty">Email không được để trống</string>
     <string name="warning_email_format">Email không đúng định dạng</string>
+    <string name="hint_search_view">Nhập tên, mã sản phẩm</string>
+    <string name="error_connect_network">Kết nối máy chủ xảy ra lỗi.</string>
 </resources>

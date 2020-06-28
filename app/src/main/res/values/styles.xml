@@ -20,4 +20,10 @@
         <item name="android:windowExitAnimation">@anim/anim_exit_dialog</item>
     </style>
 
+    <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <!-- Search button icon -->
+        <item name="searchIcon">@drawable/search</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+    </style>
+
 </resources>

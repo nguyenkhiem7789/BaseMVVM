@@ -4,6 +4,8 @@ import com.nguyen.basemvvm.ui.authentication.di.LoginComponent
 import com.nguyen.basemvvm.ui.authentication.di.LoginModule
 import com.nguyen.basemvvm.ui.base.di.module.ApiClientModule
 import com.nguyen.basemvvm.ui.base.di.module.AppModule
+import com.nguyen.basemvvm.ui.listProduct.di.ListProductComponent
+import com.nguyen.basemvvm.ui.listProduct.di.ListProductModule
 import dagger.Component
 import javax.inject.Singleton
 
@@ -17,5 +19,6 @@ import javax.inject.Singleton
         ApiClientModule::class)
 )
 interface AppComponent {
-    fun plus(loginModule: LoginModule): LoginComponent
+    fun plus(module: LoginModule): LoginComponent
+    fun plus(module: ListProductModule): ListProductComponent
 }

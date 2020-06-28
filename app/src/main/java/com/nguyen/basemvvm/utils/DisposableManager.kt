@@ -8,10 +8,10 @@ import io.reactivex.disposables.Disposable
  * Created by apple on 9/22/17.
  */
 object DisposableManager {
-    var compositeDisposable: CompositeDisposable? = null
+    private var compositeDisposable: CompositeDisposable? = null
 
-    fun getDisposable(): CompositeDisposable {
-        if(compositeDisposable == null) {
+    private fun getDisposable(): CompositeDisposable {
+        if(compositeDisposable == null || compositeDisposable!!.isDisposed) {
             compositeDisposable = CompositeDisposable()
         }
         return compositeDisposable!!
@@ -21,14 +21,10 @@ object DisposableManager {
         getDisposable().add(disposable)
     }
 
-    fun dispose() {
+    fun clear() {
         if(getDisposable().size() > 0) {
             getDisposable().dispose()
-        }
-    }
-
-    fun clear() {
-        if(getDisposable().size() > 0)
             getDisposable().clear()
+        }
     }
 }

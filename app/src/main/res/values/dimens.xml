@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="progress_bar_radius">72.0dp</dimen>
+    <dimen name="progress_bar_radius">44.0dp</dimen>
+    <dimen name="padding">14dp</dimen>
+    <dimen name="layout_margin">8dp</dimen>
 </resources>

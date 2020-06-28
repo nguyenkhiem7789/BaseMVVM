@@ -7,7 +7,7 @@ import androidx.annotation.LongDef
  */
 class Constant {
     companion object {
-        val BASE_URL = "https://test-services.vntrip.vn/vntrip/"
+        val BASE_URL = "https://listing.stage.tekoapis.net/api/"
 
         val BASE_IMAGE_URL = "https://statics.vntrip.vn/data-v2/img_origin/"
 

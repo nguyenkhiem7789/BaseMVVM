@@ -1,22 +1,20 @@
 package com.nguyen.basemvvm.ui.base.viewmodel
 import com.nguyen.basemvvm.ui.base.adapter.LoadMoreAdapter
-import com.nguyen.basemvvm.ui.base.view.BaseActivity
-import com.nguyen.basemvvm.ui.base.view.Loading
 import com.nguyen.basemvvm.utils.DisposableManager
 import io.reactivex.disposables.Disposable
-import io.reactivex.subscribers.DisposableSubscriber
+import io.reactivex.subjects.BehaviorSubject
 
 /**
  * Created by apple on 9/22/17.
  */
 abstract class SwipeRefreshLoadMoreViewModel (
-    var baseActivity: BaseActivity,
     var adapter: LoadMoreAdapter<*>
 ) {
+    private var disposableRefresh: Disposable? = null
 
-    var disposableRequest: Disposable? = null
+    private var disposableLoadMore: Disposable? = null
 
-    var disposableLoadMore: Disposable? = null
+    var isLoading: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
     var pageSize: Int = 10
 
@@ -24,70 +22,30 @@ abstract class SwipeRefreshLoadMoreViewModel (
         return false
     }
 
-    fun refreshListener() {
+    fun refresh() {
         // stop load more
-        DisposableManager.clear()
+        disposableLoadMore?.dispose()
         adapter.restate()
         //reset current pager to 1
         adapter.resetPage()
-        disposableRequest = refreshData()
-        DisposableManager.add(disposableRequest!!)
+        disposableRefresh = refreshData()
+        DisposableManager.add(disposableRefresh!!)
     }
 
     fun loadData() {
-        Loading.show(baseActivity)
         // load more data
         adapter.setLoadMoreData {
             // stop refresh data
-            DisposableManager.clear()
+            disposableRefresh?.dispose()
             // load more
             disposableLoadMore = loadMoreData(it)
             DisposableManager.add(disposableLoadMore!!)
+            adapter.isClockLoadMore = false
         }
     }
 
-    inner open class LoadMoreSubscriber<T>: DisposableSubscriber<T>() {
-        override fun onComplete() {
-        }
+    abstract fun refreshData(): Disposable?
 
-        override fun onNext(t: T) {
-            Loading.dismiss()
-            // restate load more
-            adapter.restate()
-        }
-
-        override fun onError(t: Throwable?) {
-            Loading.dismiss()
-            //restate load more
-            adapter.restate()
-        }
-
-    }
-
-    inner open class RefreshSubscriber<T>: DisposableSubscriber<T>() {
-        override fun onComplete() {
-
-        }
-
-        override fun onNext(response: T) {
-            Loading.dismiss()
-            if (response == null)
-                return
-            adapter.clearAdapter()
-        }
-
-        override fun onError(t: Throwable?) {
-            Loading.dismiss()
-        }
-
-    }
-
-    abstract fun refreshData(): Disposable
-
-    abstract fun loadMoreData(page: Int): Disposable
-
-    fun onDestroyView() {
-        DisposableManager.clear()
-    }
+    abstract fun loadMoreData(page: Int): Disposable?
 
 }
