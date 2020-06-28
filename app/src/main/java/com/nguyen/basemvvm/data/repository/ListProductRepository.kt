@@ -10,14 +10,10 @@ import io.reactivex.schedulers.Schedulers
 
 class ListProductRepository(private val apiService: ApiService) {
 
-    private var isRequesting: Boolean = false
-
     fun getListProduct(request: ListProductRequest
     ): Flowable<ListProductResponse> {
         return apiService.getListProductAsync(request.channel, request.visitorId,
             request.query, request.terminal, request.page, request.limit)
-            .doOnSubscribe {isRequesting = true}
-            .doOnTerminate {isRequesting = false}
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .toFlowable(BackpressureStrategy.BUFFER)

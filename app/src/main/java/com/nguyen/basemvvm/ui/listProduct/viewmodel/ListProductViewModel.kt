@@ -29,7 +29,7 @@ class ListProductViewModel(
         if(request == null) {
             return null
         }
-        request!!.page == 1
+        request!!.page = 1
         return repository.getListProduct(request!!).subscribeWith(RefreshProductSubscriber())
     }
 

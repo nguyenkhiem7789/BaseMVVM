@@ -11,14 +11,10 @@ import io.reactivex.schedulers.Schedulers
 
 class LoginRepository(val apiService: ApiService) {
 
-    private var isRequestingLogin: Boolean = false
-
     fun login(request: LoginRequest
     ): Flowable<LoginResponse> {
         return apiService.login(request.username, request.password, Constant
             .CLIENT_ID, Constant.CLIENT_SECRET, Constant.GRANT_PASS_TYPE)
-            .doOnSubscribe {isRequestingLogin = true}
-            .doOnTerminate {isRequestingLogin = false}
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .toFlowable(BackpressureStrategy.BUFFER)
