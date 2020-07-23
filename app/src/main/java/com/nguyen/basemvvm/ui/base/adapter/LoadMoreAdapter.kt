@@ -1,18 +1,13 @@
 package com.nguyen.basemvvm.ui.base.adapter
 
-import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nguyen.basemvvm.R
-import com.nguyen.basemvvm.data.remote.response.Product
 import com.nguyen.basemvvm.ui.base.view.EndlessRecyclerOnScrollListener
 import kotlinx.android.synthetic.main.layout_loading.view.*
-import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Created by apple on 9/17/17.
@@ -29,14 +24,13 @@ abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : Recycl
 
     abstract fun onBindViewHolderItem(holder: RecyclerView.ViewHolder, position: Int)
 
-    lateinit var scrollListener: EndlessRecyclerOnScrollListener
+    private var scrollListener: EndlessRecyclerOnScrollListener? = null
 
     var parentView: RecyclerView? = null
 
     var isClockLoadMore = false
 
     fun setLoadMoreData(loadMoreListener: (currentPage: Int) -> Unit) {
-        loadMoreListener(1)
         if(parentView == null) {
             return
         }
@@ -49,7 +43,7 @@ abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : Recycl
                 }
             }
         }
-        parentView?.addOnScrollListener(scrollListener)
+        parentView?.addOnScrollListener(scrollListener!!)
     }
 
     private fun loadMore() {
@@ -58,6 +52,9 @@ abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : Recycl
     }
 
     override fun getItemViewType(position: Int): Int {
+        if(arrayData.count() <= 0) {
+            return 0
+        }
         if(arrayData[position] == null) {
             return TYPE_LOAD_MORE
         } else {
@@ -92,7 +89,7 @@ abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : Recycl
     }
 
     fun restate() {
-        scrollListener.restate()
+        scrollListener?.restate()
         if(arrayData.size > 0 && arrayData[arrayData.size - 1] == null) {
             arrayData.remove(arrayData[arrayData.size - 1])
             notifyItemRemoved(arrayData.size)
@@ -100,15 +97,17 @@ abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : Recycl
     }
 
     fun finishLoadMore() {
-        scrollListener.finishLoadMore()
+        scrollListener?.finishLoadMore()
     }
 
     fun incrementPage() {
-        scrollListener.currentPage++
+        scrollListener?.let {
+            it.currentPage++
+        }
     }
 
     fun resetPage() {
-        scrollListener.currentPage = 1
+        scrollListener?.currentPage = 1
     }
 
     fun addData(arrayMoreData: ArrayList<T?>) {

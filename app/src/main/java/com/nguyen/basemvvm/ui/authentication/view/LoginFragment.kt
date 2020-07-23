@@ -12,6 +12,7 @@ import com.nguyen.basemvvm.ui.authentication.di.LoginModule
 import com.nguyen.basemvvm.ui.authentication.viewmodel.LoginViewModel
 import com.nguyen.basemvvm.ui.base.view.BaseFragment
 import com.nguyen.basemvvm.ui.base.view.NavigationManager
+import com.nguyen.basemvvm.ui.base.viewmodel.BaseViewModel
 import com.nguyen.basemvvm.ui.listProduct.view.ListProductFragment
 import com.nguyen.basemvvm.utils.DisposableManager
 import com.nguyen.basemvvm.utils.SnackBar
@@ -79,6 +80,10 @@ class LoginFragment : BaseFragment() {
                 .plus(LoginModule())
                 .inject(this)
         }
+    }
+
+    override fun getViewModel(): BaseViewModel? {
+        return null
     }
 
     override fun onDestroy() {

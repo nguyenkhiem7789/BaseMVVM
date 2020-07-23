@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/topLayout"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:background="@color/colorPrimary"
@@ -26,13 +27,15 @@
             android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:background="@drawable/designable_edit_text"
-            android:queryHint="@string/hint_search_view" />
+            android:hint="@string/hint_search_view" />
     </LinearLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_below="@+id/topLayout"
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="visible"
         >
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/productRecyclerView"
@@ -41,4 +44,13 @@
             />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</LinearLayout>
+    <include
+        android:id="@+id/emptyLayout"
+        layout="@layout/layout_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topLayout"
+        android:layout_marginTop="-1dp"
+        android:visibility="invisible" />
+
+</RelativeLayout>

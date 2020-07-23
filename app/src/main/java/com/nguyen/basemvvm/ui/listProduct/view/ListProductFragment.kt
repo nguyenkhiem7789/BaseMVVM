@@ -14,6 +14,7 @@ import com.nguyen.basemvvm.data.remote.request.ListProductRequest
 import com.nguyen.basemvvm.data.remote.response.Product
 import com.nguyen.basemvvm.ui.base.view.BaseFragment
 import com.nguyen.basemvvm.ui.base.view.Loading
+import com.nguyen.basemvvm.ui.base.viewmodel.BaseViewModel
 import com.nguyen.basemvvm.ui.listProduct.adapter.ListProductAdapter
 import com.nguyen.basemvvm.ui.listProduct.di.ListProductModule
 import com.nguyen.basemvvm.ui.listProduct.viewmodel.ListProductViewModel
@@ -39,6 +40,10 @@ class ListProductFragment : BaseFragment() {
 
     private val PAGE_SIZE = 10
 
+    override fun getViewModel(): BaseViewModel? {
+        return viewModel
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -51,18 +56,13 @@ class ListProductFragment : BaseFragment() {
     }
 
     private fun initView(view: View) {
+        view.productRecyclerView.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
         view.productRecyclerView.layoutManager = LinearLayoutManager(activity)
-        adapter.parentView = view.productRecyclerView
         view.productRecyclerView.adapter = adapter
-        view.productRecyclerView.addItemDecoration(
-            DividerItemDecoration(
-                activity,
-                DividerItemDecoration.VERTICAL
-            )
-        )
+        viewModel.initLoadAfter(view.productRecyclerView)
         view.swipeRefreshLayout.setOnRefreshListener(OnRefreshListener {
             //refresh data
-            viewModel.refresh()
+            getListProduct("")
         })
     }
 
@@ -78,7 +78,7 @@ class ListProductFragment : BaseFragment() {
         )
         viewModel.request = request
         //load data
-        viewModel.loadData()
+        viewModel.loadInitial()
     }
 
     private fun setupBinding() {
@@ -95,14 +95,15 @@ class ListProductFragment : BaseFragment() {
                     Loading.dismiss()
                 }
             })
+
         DisposableManager.add(viewModel
             .isRefreshing
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                Log.e("XisRefreshing", "=====> 11111 false")
                 swipeRefreshLayout.isRefreshing = false
             })
+
         DisposableManager.add(viewModel
             .errorMsg
             .subscribeOn(Schedulers.io())
@@ -110,6 +111,22 @@ class ListProductFragment : BaseFragment() {
             .subscribe {
                 SnackBar.show(view!!, it, false)
             })
+
+        addDisposable(
+            viewModel
+                .displayEmptyView
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if(it) {
+                        swipeRefreshLayout.visibility = View.GONE
+                        emptyLayout.visibility = View.VISIBLE
+                    } else {
+                        swipeRefreshLayout.visibility = View.VISIBLE
+                        emptyLayout.visibility = View.GONE
+                    }
+                }
+        )
     }
 
     private fun setupComponent() {

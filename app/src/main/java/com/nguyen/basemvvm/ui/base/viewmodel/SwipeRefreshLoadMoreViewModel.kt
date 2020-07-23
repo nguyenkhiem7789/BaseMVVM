@@ -1,6 +1,7 @@
 package com.nguyen.basemvvm.ui.base.viewmodel
+
+import androidx.recyclerview.widget.RecyclerView
 import com.nguyen.basemvvm.ui.base.adapter.LoadMoreAdapter
-import com.nguyen.basemvvm.utils.DisposableManager
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
 
@@ -9,7 +10,7 @@ import io.reactivex.subjects.BehaviorSubject
  */
 abstract class SwipeRefreshLoadMoreViewModel (
     var adapter: LoadMoreAdapter<*>
-) {
+) : BaseViewModel() {
     private var disposableRefresh: Disposable? = null
 
     private var disposableLoadMore: Disposable? = null
@@ -22,30 +23,30 @@ abstract class SwipeRefreshLoadMoreViewModel (
         return false
     }
 
-    fun refresh() {
+    fun initLoadAfter(recyclerView: RecyclerView) {
+        adapter.parentView = recyclerView
+        adapter.setLoadMoreData {
+            // stop refresh data
+            disposableRefresh?.dispose()
+            // load more
+            disposableLoadMore = loadAfterData(it)
+            addDisposable(disposableLoadMore!!)
+            adapter.isClockLoadMore = false
+        }
+    }
+
+    fun loadInitial() {
         // stop load more
         disposableLoadMore?.dispose()
         adapter.restate()
         //reset current pager to 1
         adapter.resetPage()
-        disposableRefresh = refreshData()
-        DisposableManager.add(disposableRefresh!!)
+        disposableRefresh = loadInitialData()
+        addDisposable(disposableRefresh!!)
     }
 
-    fun loadData() {
-        // load more data
-        adapter.setLoadMoreData {
-            // stop refresh data
-            disposableRefresh?.dispose()
-            // load more
-            disposableLoadMore = loadMoreData(it)
-            DisposableManager.add(disposableLoadMore!!)
-            adapter.isClockLoadMore = false
-        }
-    }
+    abstract fun loadInitialData(): Disposable?
 
-    abstract fun refreshData(): Disposable?
-
-    abstract fun loadMoreData(page: Int): Disposable?
+    abstract fun loadAfterData(page: Int): Disposable?
 
 }
