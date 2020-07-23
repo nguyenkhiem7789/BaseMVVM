@@ -78,7 +78,7 @@ abstract class LoadMoreAdapter<T>(private var arrayData: ArrayList<T?>) : Recycl
         var viewHolder: RecyclerView.ViewHolder? = null
         viewHolder = when (viewType) {
             TYPE_LOAD_MORE -> {
-                var view = LayoutInflater.from(parent.context).inflate(R.layout.layout_loading, parent, false)
+                var view = LayoutInflater.from(parent.context).inflate(R.layout.layout_loadmore, parent, false)
                 LoadMoreViewHoler(view)
             }
             else -> {

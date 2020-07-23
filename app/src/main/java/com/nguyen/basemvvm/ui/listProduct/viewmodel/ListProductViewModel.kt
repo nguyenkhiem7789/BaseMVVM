@@ -38,9 +38,6 @@ class ListProductViewModel(
         if(request == null) {
             return null
         }
-        if(page == 1) {
-            isLoading.onNext(true)
-        }
         request!!.page = page
         return repository.getListProduct(request!!).subscribeWith(LoadAfterSubscriber())
     }
@@ -48,6 +45,7 @@ class ListProductViewModel(
     inner class LoadInitialSubscriber: DisposableSubscriber<ListProductResponse>() {
         override fun onComplete() {
             isRefreshing.onNext(false)
+            isLoading.onNext(false)
         }
 
         override fun onNext(response: ListProductResponse) {
@@ -66,12 +64,12 @@ class ListProductViewModel(
             productAdapter.restate()
             errorMsg.onNext(t.toString())
             isRefreshing.onNext(false)
+            isLoading.onNext(false)
         }
     }
 
     inner class LoadAfterSubscriber: DisposableSubscriber<ListProductResponse>() {
         override fun onComplete() {
-            isLoading.onNext(false)
         }
 
         override fun onNext(response: ListProductResponse) {

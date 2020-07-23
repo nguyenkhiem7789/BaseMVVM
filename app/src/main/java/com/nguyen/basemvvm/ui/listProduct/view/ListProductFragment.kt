@@ -1,13 +1,16 @@
 package com.nguyen.basemvvm.ui.listProduct.view
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import com.jakewharton.rxbinding2.widget.RxTextView
 import com.nguyen.basemvvm.BaseApplication
 import com.nguyen.basemvvm.R
 import com.nguyen.basemvvm.data.remote.request.ListProductRequest
@@ -25,6 +28,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_list_product.*
 import kotlinx.android.synthetic.main.fragment_list_product.view.*
 import kotlinx.android.synthetic.main.fragment_list_product.view.swipeRefreshLayout
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ListProductFragment : BaseFragment() {
@@ -40,6 +44,8 @@ class ListProductFragment : BaseFragment() {
 
     private val PAGE_SIZE = 10
 
+    private var query = ""
+
     override fun getViewModel(): BaseViewModel? {
         return viewModel
     }
@@ -50,7 +56,8 @@ class ListProductFragment : BaseFragment() {
         val view = inflater.inflate(R.layout.fragment_list_product, container, false)
         setupComponent()
         initView(view)
-        getListProduct("")
+        Loading.show(activity)
+        getListProduct(query)
         setupBinding()
         return view
     }
@@ -62,8 +69,15 @@ class ListProductFragment : BaseFragment() {
         viewModel.initLoadAfter(view.productRecyclerView)
         view.swipeRefreshLayout.setOnRefreshListener(OnRefreshListener {
             //refresh data
-            getListProduct("")
+            getListProduct(query)
         })
+
+        search(view.searchView)
+        view.deleteImageView.setOnClickListener {
+            view.searchView.setText("")
+            query = ""
+            getListProduct(query)
+        }
     }
 
     // request api get data list product
@@ -79,6 +93,20 @@ class ListProductFragment : BaseFragment() {
         viewModel.request = request
         //load data
         viewModel.loadInitial()
+    }
+
+    private fun search(editText: TextView) {
+        val d = RxTextView.textChanges(editText)
+            .debounce(200, TimeUnit.MILLISECONDS)
+            .filter { item: CharSequence -> item.count() >= 0 }
+//            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { text: CharSequence ->
+                if (TextUtils.isEmpty(text)) deleteImageView.visibility = View.GONE else deleteImageView.visibility = View.VISIBLE
+                query = text.toString()
+                getListProduct(editText.text.toString())
+            }
+        addDisposable(d)
     }
 
     private fun setupBinding() {
